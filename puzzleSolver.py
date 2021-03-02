@@ -1,4 +1,6 @@
 import sys
+from dataclasses import dataclass, field
+from typing import Any
 import queue
 from TileProblem import TileProblem
 from Heuristics import Heuristics
@@ -15,28 +17,34 @@ H = (sys.argv[3]) # H
 INPUT = (sys.argv[4]) # INPUT FILE PATH
 OUTPUT = (sys.argv[5]) # OUTPUT FILE PATH
 
+@dataclass(order=True)
+class PrioritizedItem:
+    priority: int
+    item: Any=field(compare=False)
+
 class Node:
     def __init__(self, problem, parent=None, action=None):
         self.problem = problem
         self.parent = parent
         self.action = action
-        self.state = problem.initial_state
+        self.state = problem.state
         # f(n)
         # g(n)
         # h(n)
-        self.priority = 0
 
 def a_star(problem, h):
     # frontier = priority_queue() # sort frontier on expected path cost
     frontier = queue.PriorityQueue()
     # frontier = frontier + make-node(start)
     start = Node(problem)
-    frontier.put(0, start)
+    frontier.put(PrioritizedItem(0, start))
     explored = []
 
     # f(n) = g(n) + h(n)
     # g(n) = cost of path from start to n so far (dist from root)
     # h(n) = estimated cost from n to G (end node)
+
+    # start has no parent
     start.g = 0
     start.h = h(start.state)
     start.f = start.g + start.h
@@ -44,13 +52,11 @@ def a_star(problem, h):
     # while not frontier.isempty():
     while not frontier.empty():
         # current <- pop(frontier) # i.e., the top of the queue
-        current = frontier.get()
+        current = frontier.get().item
         # if goal-test(current) return success # goal test when node expands
+        print(current.action)
         if problem.goal_test(current.state):
             return True 
-
-        
-
         # if current not in explored:
         if not current in explored:
             # explored <- explored + current.state
@@ -58,12 +64,14 @@ def a_star(problem, h):
             # for each action in current.actions():
             for action in problem.state_actions(current.state):
                 # new <- action(current.state)
-                new = problem.change_state(current.state, action)
+                new = problem.change_state(current.state, action)  # new problem
                 # new-node <- make-node(new, current, action)
                 new_node = Node(new, current, action)
+                new_node.g = new_node.parent.g + 1 # current.g + distance between current and successor
+                new_node.h = h(new_node.state)
+                new_node.f = new_node.g + new_node.h
                 # frontier = frontier + new-node
-                frontier.append(new_node)
-                
+                frontier.put(PrioritizedItem(new_node.f, new_node))
     return False
 
 # -------------------------------------------------------
@@ -73,19 +81,19 @@ if __name__ == '__main__':
     problem = TileProblem(A, N, H, INPUT, OUTPUT)
     heuristics = Heuristics()
 
-    print(problem.initial_state)
+    print(problem.state)
     arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
     arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
     arr3 = [['1', '2', '4'], ['3', '5', '6'], ['8', '7', '']]
     arr4 = [['1', '3', '2'], ['', '5', '6'], ['8', '7', '4']]
     
-    state = problem.initial_state
-    print(problem.goal_test(state))
-    print(problem.state_actions(state))
-    print(problem.change_state(state, 'U'))
-    print(state)
+    state = problem.state
+    # print(problem.goal_test(state))
+    # print(problem.state_actions(state))
+    # print(problem.change_state(state, 'U').state)
 
-    
+    print(a_star(problem, heuristics.hamming_distance))
+    # print(a_star(problem, heuristics.manhattan_distance))
 
     # print(heuristics.hamming_distance(state))
     # print(heuristics.manhattan_distance(state))

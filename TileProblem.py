@@ -13,8 +13,8 @@ class TileProblem:
         self.heuristic = heuristic
         self.input_file = input_file
         self.output_file = output_file
-        self.initial_state = self.input_to_state()
-        self.actions = self.state_actions(self.initial_state) # ['L', 'R', 'D', 'U']
+        self.state = self.input_to_state()
+        self.actions = self.state_actions(self.state) # ['L', 'R', 'D', 'U']
 
     def input_to_state(self):
         n = int(self.size)
@@ -64,6 +64,7 @@ class TileProblem:
 
     # swap tiles, update state
     def change_state(self, state, action):
+        problem = TileProblem(self.algorithm, self.size, self.heuristic, self.input_file, self.output_file)
         copy = self.copy(state)
         n = int(self.size)
         r = 0
@@ -87,7 +88,8 @@ class TileProblem:
         elif (action == 'U'):
             # row - 1
             copy[r][c], copy[r-1][c] = copy[r-1][c], copy[r][c]
-        return copy
+        problem.state = copy
+        return problem
 
     def goal_test(self, state): 
         n = len(state[0])
