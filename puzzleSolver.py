@@ -28,9 +28,20 @@ class Node:
         self.parent = parent
         self.action = action
         self.state = problem.state
-        # f(n)
         # g(n)
-        # h(n)
+        if (self.parent != None):
+            self.g = parent.g + 1
+        else:
+            self.g = 0
+        # f(n) = g(n) + h(n)
+
+def reconstruct_path(node):
+    solution = []
+    ptr = node
+    while(ptr.parent!=None):
+        solution.insert(0, ptr.action)
+        ptr = ptr.parent
+    return solution
 
 def a_star(problem, h):
     # frontier = priority_queue() # sort frontier on expected path cost
@@ -45,7 +56,7 @@ def a_star(problem, h):
     # h(n) = estimated cost from n to G (end node)
 
     # start has no parent
-    start.g = 0
+    # start.g = 0
     start.h = h(start.state)
     start.f = start.g + start.h
 
@@ -54,20 +65,28 @@ def a_star(problem, h):
         # current <- pop(frontier) # i.e., the top of the queue
         current = frontier.get().item
         # if goal-test(current) return success # goal test when node expands
-        print(current.action)
         if problem.goal_test(current.state):
-            return True 
+            return reconstruct_path(current) 
         # if current not in explored:
         if not current in explored:
             # explored <- explored + current.state
             explored.append(current)
             # for each action in current.actions():
-            for action in problem.state_actions(current.state):
+            for action in problem.state_actions(current.state): # neighbors
                 # new <- action(current.state)
                 new = problem.change_state(current.state, action)  # new problem
                 # new-node <- make-node(new, current, action)
-                new_node = Node(new, current, action)
-                new_node.g = new_node.parent.g + 1 # current.g + distance between current and successor
+                new_node = Node(new, current, action) # neighbor
+
+                # tentative_g = current.g + distance between current and successor
+                tentative_g = current.g + 1 
+                if (tentative_g < new_node.g):
+                    # this path is better than any previous one
+                    new_node.parent = current
+                    new_node.g = tentative_g
+                    print("test")
+
+                # new_node.g = new_node.parent.g + 1 
                 new_node.h = h(new_node.state)
                 new_node.f = new_node.g + new_node.h
                 # frontier = frontier + new-node
@@ -87,7 +106,7 @@ if __name__ == '__main__':
     arr3 = [['1', '2', '4'], ['3', '5', '6'], ['8', '7', '']]
     arr4 = [['1', '3', '2'], ['', '5', '6'], ['8', '7', '4']]
     
-    state = problem.state
+    # state = problem.state
     # print(problem.goal_test(state))
     # print(problem.state_actions(state))
     # print(problem.change_state(state, 'U').state)

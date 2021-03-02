@@ -17,7 +17,7 @@ import math
 # h1 dominates h2 and is better for search
 
 class Heuristics:
-    #def __init__(self):
+    # def __init__(self):
     #    self.data = []
 
     def hamming_distance(self, state):
