@@ -97,6 +97,51 @@ def a_star(problem, h):
                     frontier.put(PrioritizedItem(new_node.f, new_node))
     return False
 
+def recursive_best_first_search(problem, h):
+    # solution, fvalue <- rbfs(problem, node(problem.initial), inf, h)
+    start = Node(problem)
+    start.h = h(start.state)
+    start.f = start.g + start.h
+    solution = rbfs(problem, start, float("inf"), h)
+    return solution
+
+def rbfs(problem, node, f_limit, h):
+    # returns solution or failure, and a new f-cost limit
+    if (problem.goal_test(node.state)):
+        return reconstruct_path(node)
+    sucessors = []
+    for action in problem.state_actions(node.state): # neighbors/sucessors
+        # add child_node(problem, node, action) into sucessors
+        new = problem.change_state(node.state, action) # new problem
+        child_node = Node(new, node, action) # neighbor
+        child_node.h = h(child_node.state)
+        child_node.f = child_node.g + child_node.h
+        sucessors.append(child_node)
+    if (not sucessors): # if successors is empty
+        # return failure, infinity
+        return (False, float("inf"))
+    for s in sucessors:
+        # update f with value from previous search if any
+        s.f = max(s.g + s.h, node.f)
+    # loop do
+    while True:
+        # best <- lowest f-value in successors
+        best = sucessors[0]
+        alternative = best
+        for s in sucessors:
+            if (s.f < best.f):
+                alternative = best
+                best = s
+        # if best.f > f-limit then return failure, best.f
+        if (best.f > f_limit):
+            return (False, best.f)
+        # alternative <- the second lowest f-value among successors
+        # result, best.f <- RBFS(problem, best, min(f-limit,alternative))
+        result = rbfs(problem, best, min(f_limit, alternative.f), h)
+        # if result not = failure then return result
+        if (result[0]):
+            return result
+
 # -------------------------------------------------------
 ### Main class ###
 
@@ -125,7 +170,10 @@ if __name__ == '__main__':
         elif (h == '2'):
             solution = a_star(problem, heuristics.hamming_distance)
     elif (a == '2'):
-        print("rbfs")
+        if (h == '1'):
+            solution = recursive_best_first_search(problem, heuristics.manhattan_distance)
+        elif (h == '2'):
+            solution = recursive_best_first_search(problem, heuristics.hamming_distance)
     
     write_output(solution, output)
 
