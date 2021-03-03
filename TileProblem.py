@@ -7,32 +7,16 @@
 # your program should construct an instance of the problem as a TileProblem object
 
 class TileProblem:
-    def __init__(self, algorithm, size, heuristic, input_file, output_file):
-        self.algorithm = algorithm
-        self.size = size
-        self.heuristic = heuristic
-        self.input_file = input_file
-        self.output_file = output_file
-        self.state = self.input_to_state()
+    def __init__(self, size, state):
+        self.size = int(size)
+        self.state = state
         self.actions = self.state_actions(self.state) # ['L', 'R', 'D', 'U']
-
-    def input_to_state(self):
-        n = int(self.size)
-        state = [[0]*n for _ in range(n)]
-        index = 0
-        f = open(self.input_file)
-        for line in f:
-            line = line.strip('\n')
-            numbers = line.split(",")
-            state[index] = numbers
-            index += 1
-        return state
 
     # transition functions (used to change state)
     def state_actions(self, state):
         # return legal actions
         state_actions = ['L', 'R', 'D', 'U']
-        n = int(self.size)
+        n = self.size
         row = 0
         col = 0
         for check in range(n*n-1):
@@ -64,9 +48,10 @@ class TileProblem:
 
     # swap tiles, update state
     def change_state(self, state, action):
-        problem = TileProblem(self.algorithm, self.size, self.heuristic, self.input_file, self.output_file)
+        # TileProblem(size, state)
         copy = self.copy(state)
-        n = int(self.size)
+        problem = TileProblem(self.size, copy)
+        n = self.size
         r = 0
         c = 0
         for check in range(n*n-1):

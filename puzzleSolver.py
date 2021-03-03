@@ -7,6 +7,26 @@ from Heuristics import Heuristics
 
 # -------------------------------------------------------
 
+def input_to_state(n, file):
+    n = int(n)
+    state = [[0]*n for _ in range(n)]
+    index = 0
+    f = open(file)
+    for line in f:
+        line = line.strip('\n')
+        numbers = line.split(",")
+        state[index] = numbers
+        index += 1
+    return state
+
+def write_output(path, file):
+    output = ",".join(path)
+    f = open(file, "w")
+    for ch in output:
+        f.write(ch)
+    f.close()
+    return True
+
 @dataclass(order=True)
 class PrioritizedItem:
     priority: int
@@ -68,27 +88,6 @@ def a_star(problem, h):
                 new = problem.change_state(current.state, action) # new problem
                 # new-node <- make-node(new, current, action)
                 new_node = Node(new, current, action) # neighbor
-
-                '''
-                # tentative_g = current.g + distance between current and successor
-                tentative_g = current.g + 1
-
-                neighbor = False
-                for q in frontier.queue:
-                    # print(q.item.g, q.item.state)
-                    if (new.state == q.item.state):
-                        neighbor = q.item
-                        break
-
-                # if (tentative_g < new_node.g)
-                if (neighbor and (tentative_g < neighbor.item.g)):
-                    # this path is better than any previous one
-                    neighbor.parent = current
-                    neighbor.g = tentative_g
-                    neighbor.f = neighbor.g + h(neighbor.state)
-                    print("test")
-                '''
-
                 # new_node.g = new_node.parent.g + 1 
                 new_node.h = h(new_node.state)
                 new_node.f = new_node.g + new_node.h
@@ -108,24 +107,27 @@ if __name__ == '__main__':
     # H is for heuristics (H=1 for h1 and H=2 for h2)
 
     # (sys.argv[0]) # puzzleSolver.py
-    A = (sys.argv[1]) # A
-    N = (sys.argv[2]) # N
-    H = (sys.argv[3]) # H
-    INPUT = (sys.argv[4]) # INPUT FILE PATH
-    OUTPUT = (sys.argv[5]) # OUTPUT FILE PATH
+    a = (sys.argv[1]) # A
+    n = (sys.argv[2]) # N
+    h = (sys.argv[3]) # H
+    input = (sys.argv[4]) # INPUT FILE PATH
+    output = (sys.argv[5]) # OUTPUT FILE PATH
 
-    problem = TileProblem(A, N, H, INPUT, OUTPUT)
+    problem = TileProblem(n, input_to_state(n, input)) # TileProblem(size, state)
     heuristics = Heuristics()
+    solution = []
 
     print(problem.state)
 
-    if (A == '1'):
-        if (H == '1'):
-            print(a_star(problem, heuristics.manhattan_distance))
-        elif (H == '2'):
-            print(a_star(problem, heuristics.hamming_distance))
-    elif (A == '2'):
+    if (a == '1'):
+        if (h == '1'):
+            solution = a_star(problem, heuristics.manhattan_distance)
+        elif (h == '2'):
+            solution = a_star(problem, heuristics.hamming_distance)
+    elif (a == '2'):
         print("rbfs")
+    
+    write_output(solution, output)
 
     # arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
     # arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
