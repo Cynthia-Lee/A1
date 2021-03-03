@@ -5,17 +5,7 @@ import queue
 from TileProblem import TileProblem
 from Heuristics import Heuristics
 
-# python puzzleSolver.py <A> <N> <H> <INPUT FILE PATH> <OUTPUT FILE PATH>
-# A is the algorithm (A=1 for A* and A=2 for RBFS)
-# N is the size of the puzzle (N=3 for 8-puzzle and N=4 for 15-puzzle)
-# H is for heuristics (H=1 for h1 and H=2 for h2)
-
-# (sys.argv[0]) # puzzleSolver.py
-A = (sys.argv[1]) # A
-N = (sys.argv[2]) # N
-H = (sys.argv[3]) # H
-INPUT = (sys.argv[4]) # INPUT FILE PATH
-OUTPUT = (sys.argv[5]) # OUTPUT FILE PATH
+# -------------------------------------------------------
 
 @dataclass(order=True)
 class PrioritizedItem:
@@ -30,7 +20,8 @@ class Node:
         self.state = problem.state
         # g(n)
         if (self.parent != None):
-            self.g = parent.g + 1
+            # cost of parent's path + distance from between parent and node
+            self.g = parent.g + 1 
         else:
             self.g = 0
         # f(n) = g(n) + h(n)
@@ -70,48 +61,83 @@ def a_star(problem, h):
         # if current not in explored:
         if not current in explored:
             # explored <- explored + current.state
-            explored.append(current)
+            explored.append(current.state)
             # for each action in current.actions():
-            for action in problem.state_actions(current.state): # neighbors
+            for action in problem.state_actions(current.state): # neighbors/sucessors
                 # new <- action(current.state)
-                new = problem.change_state(current.state, action)  # new problem
+                new = problem.change_state(current.state, action) # new problem
                 # new-node <- make-node(new, current, action)
                 new_node = Node(new, current, action) # neighbor
 
+                '''
                 # tentative_g = current.g + distance between current and successor
-                tentative_g = current.g + 1 
-                if (tentative_g < new_node.g):
+                tentative_g = current.g + 1
+
+                neighbor = False
+                for q in frontier.queue:
+                    # print(q.item.g, q.item.state)
+                    if (new.state == q.item.state):
+                        neighbor = q.item
+                        break
+
+                # if (tentative_g < new_node.g)
+                if (neighbor and (tentative_g < neighbor.item.g)):
                     # this path is better than any previous one
-                    new_node.parent = current
-                    new_node.g = tentative_g
+                    neighbor.parent = current
+                    neighbor.g = tentative_g
+                    neighbor.f = neighbor.g + h(neighbor.state)
                     print("test")
+                '''
 
                 # new_node.g = new_node.parent.g + 1 
                 new_node.h = h(new_node.state)
                 new_node.f = new_node.g + new_node.h
-                # frontier = frontier + new-node
-                frontier.put(PrioritizedItem(new_node.f, new_node))
+                
+                if (not new_node.state in explored):
+                    # frontier = frontier + new-node
+                    frontier.put(PrioritizedItem(new_node.f, new_node))
     return False
 
 # -------------------------------------------------------
 ### Main class ###
 
 if __name__ == '__main__':
+    # python puzzleSolver.py <A> <N> <H> <INPUT FILE PATH> <OUTPUT FILE PATH>
+    # A is the algorithm (A=1 for A* and A=2 for RBFS)
+    # N is the size of the puzzle (N=3 for 8-puzzle and N=4 for 15-puzzle)
+    # H is for heuristics (H=1 for h1 and H=2 for h2)
+
+    # (sys.argv[0]) # puzzleSolver.py
+    A = (sys.argv[1]) # A
+    N = (sys.argv[2]) # N
+    H = (sys.argv[3]) # H
+    INPUT = (sys.argv[4]) # INPUT FILE PATH
+    OUTPUT = (sys.argv[5]) # OUTPUT FILE PATH
+
     problem = TileProblem(A, N, H, INPUT, OUTPUT)
     heuristics = Heuristics()
 
     print(problem.state)
-    arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
-    arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
-    arr3 = [['1', '2', '4'], ['3', '5', '6'], ['8', '7', '']]
-    arr4 = [['1', '3', '2'], ['', '5', '6'], ['8', '7', '4']]
+
+    if (A == '1'):
+        if (H == '1'):
+            print(a_star(problem, heuristics.manhattan_distance))
+        elif (H == '2'):
+            print(a_star(problem, heuristics.hamming_distance))
+    elif (A == '2'):
+        print("rbfs")
+
+    # arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
+    # arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
+    # arr3 = [['1', '2', '4'], ['3', '5', '6'], ['8', '7', '']]
+    # arr4 = [['1', '3', '2'], ['', '5', '6'], ['8', '7', '4']]
     
     # state = problem.state
     # print(problem.goal_test(state))
     # print(problem.state_actions(state))
     # print(problem.change_state(state, 'U').state)
 
-    print(a_star(problem, heuristics.hamming_distance))
+    # print(a_star(problem, heuristics.hamming_distance))
     # print(a_star(problem, heuristics.manhattan_distance))
 
     # print(heuristics.hamming_distance(state))
