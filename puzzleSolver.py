@@ -129,15 +129,18 @@ def rbfs(problem, node, f_limit, h):
         best = sucessors[0]
         alternative = best
         for s in sucessors:
-            if (s.f < best.f):
+            if (s.f <= best.f):
                 alternative = best
                 best = s
+            elif (s.f <= alternative.f):
+                alternative = s
         # if best.f > f-limit then return failure, best.f
         if (best.f > f_limit):
             return (False, best.f)
         # alternative <- the second lowest f-value among successors
         # result, best.f <- RBFS(problem, best, min(f-limit,alternative))
         result = rbfs(problem, best, min(f_limit, alternative.f), h)
+        best.f = result[1]
         # if result not = failure then return result
         if (result[0]):
             return result
@@ -150,20 +153,20 @@ if __name__ == '__main__':
     # A is the algorithm (A=1 for A* and A=2 for RBFS)
     # N is the size of the puzzle (N=3 for 8-puzzle and N=4 for 15-puzzle)
     # H is for heuristics (H=1 for h1 and H=2 for h2)
-
+    '''
     # (sys.argv[0]) # puzzleSolver.py
     a = (sys.argv[1]) # A
     n = (sys.argv[2]) # N
     h = (sys.argv[3]) # H
     input = (sys.argv[4]) # INPUT FILE PATH
     output = (sys.argv[5]) # OUTPUT FILE PATH
-
+    
     problem = TileProblem(n, input_to_state(n, input)) # TileProblem(size, state)
     heuristics = Heuristics()
     solution = []
 
     print(problem.state)
-
+    
     if (a == '1'):
         if (h == '1'):
             solution = a_star(problem, heuristics.manhattan_distance)
@@ -176,6 +179,42 @@ if __name__ == '__main__':
             solution = recursive_best_first_search(problem, heuristics.hamming_distance)
     
     write_output(solution, output)
+    '''
+    # TESTS
+    heuristics = Heuristics()
+    problem1 = TileProblem(3, input_to_state(3, "puzzle1.txt"))
+    problem2 = TileProblem(3, input_to_state(3, "puzzle2.txt"))
+    problem3 = TileProblem(3, input_to_state(3, "puzzle3.txt"))
+    problem4 = TileProblem(4, input_to_state(4, "puzzle4.txt"))
+    problem5 = TileProblem(4, input_to_state(4, "puzzle5.txt"))
+    # A* with hamming
+    print("A* with hamming")
+    print(a_star(problem1, heuristics.hamming_distance))
+    print(a_star(problem2, heuristics.hamming_distance))
+    print(a_star(problem3, heuristics.hamming_distance))
+    print(a_star(problem4, heuristics.hamming_distance))
+    print(a_star(problem5, heuristics.hamming_distance))
+    # A* with manhattan
+    print("A* with manhattan")
+    print(a_star(problem1, heuristics.manhattan_distance))
+    print(a_star(problem2, heuristics.manhattan_distance))
+    print(a_star(problem3, heuristics.manhattan_distance))
+    print(a_star(problem4, heuristics.manhattan_distance))
+    print(a_star(problem5, heuristics.manhattan_distance))
+    # RBFS with hamming
+    print("RBFS with hamming")
+    print(recursive_best_first_search(problem1, heuristics.hamming_distance))
+    print(recursive_best_first_search(problem2, heuristics.hamming_distance))
+    print(recursive_best_first_search(problem3, heuristics.hamming_distance))
+    print(recursive_best_first_search(problem4, heuristics.hamming_distance))
+    print(recursive_best_first_search(problem5, heuristics.hamming_distance))
+    # RBFS with manhattan
+    print("RBFS with manhattan")
+    print(recursive_best_first_search(problem1, heuristics.manhattan_distance))
+    print(recursive_best_first_search(problem2, heuristics.manhattan_distance))
+    print(recursive_best_first_search(problem3, heuristics.manhattan_distance))
+    print(recursive_best_first_search(problem4, heuristics.manhattan_distance))
+    print(recursive_best_first_search(problem5, heuristics.manhattan_distance))
 
     # arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
     # arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
