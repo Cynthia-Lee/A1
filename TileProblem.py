@@ -13,8 +13,9 @@ class TileProblem:
         self.actions = self.state_actions(self.state) # ['L', 'R', 'D', 'U']
 
     # transition functions (used to change state)
+
+    # returns legal actions for the state
     def state_actions(self, state):
-        # return legal actions
         state_actions = ['L', 'R', 'D', 'U']
         n = self.size
         row = 0
@@ -46,7 +47,7 @@ class TileProblem:
             newState.append([item for item in row])
         return newState
 
-    # swap tiles, update state
+    # swap tiles, change state, return new problem
     def change_state(self, state, action):
         # TileProblem(size, state)
         copy = self.copy(state)

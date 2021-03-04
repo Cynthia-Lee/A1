@@ -6,7 +6,12 @@ from TileProblem import TileProblem
 from Heuristics import Heuristics
 
 # -------------------------------------------------------
+# Sources used:
+# Lecture slides
+# https://pages.mtu.edu/~nilufer/classes/cs5811/2012-fall/lecture-slides/cs5811-ch03-search-b-informed-v2.pdf
+# -------------------------------------------------------
 
+# takes in input file and returns a 2d array to represent the state
 def input_to_state(n, file):
     n = int(n)
     state = [[0]*n for _ in range(n)]
@@ -19,6 +24,7 @@ def input_to_state(n, file):
         index += 1
     return state
 
+# writes the solution path array to the output file
 def write_output(path, file):
     output = ",".join(path)
     f = open(file, "w")
@@ -153,7 +159,7 @@ if __name__ == '__main__':
     # A is the algorithm (A=1 for A* and A=2 for RBFS)
     # N is the size of the puzzle (N=3 for 8-puzzle and N=4 for 15-puzzle)
     # H is for heuristics (H=1 for h1 and H=2 for h2)
-    '''
+    
     # (sys.argv[0]) # puzzleSolver.py
     a = (sys.argv[1]) # A
     n = (sys.argv[2]) # N
@@ -179,7 +185,7 @@ if __name__ == '__main__':
             solution = recursive_best_first_search(problem, heuristics.hamming_distance)
     
     write_output(solution, output)
-    '''
+    
     # TESTS
     heuristics = Heuristics()
     problem1 = TileProblem(3, input_to_state(3, "puzzle1.txt"))
@@ -215,33 +221,6 @@ if __name__ == '__main__':
     print(recursive_best_first_search(problem3, heuristics.manhattan_distance))
     print(recursive_best_first_search(problem4, heuristics.manhattan_distance))
     print(recursive_best_first_search(problem5, heuristics.manhattan_distance))
-
-    # arr1 = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '']]
-    # arr2 = [['1', '2', '3', '4'], ['5', '6', '7', '8'], ['9', '10', '11', '12'], ['13', '14', '15','']]
-    # arr3 = [['1', '2', '4'], ['3', '5', '6'], ['8', '7', '']]
-    # arr4 = [['1', '3', '2'], ['', '5', '6'], ['8', '7', '4']]
-    
-    # state = problem.state
-    # print(problem.goal_test(state))
-    # print(problem.state_actions(state))
-    # print(problem.change_state(state, 'U').state)
-
-    # print(a_star(problem, heuristics.hamming_distance))
-    # print(a_star(problem, heuristics.manhattan_distance))
-
-    # print(heuristics.hamming_distance(state))
-    # print(heuristics.manhattan_distance(state))
-
-    # print(arr3)
-    # print(heuristics.manhattan_distance(arr3))
-
-    # print(heuristics.manhattan_distance(arr4))
-
-    # print("GOOD")
-    # print(problem.goal_test(arr1))
-    # print(problem.goal_test(arr2))
-    # print("BAD")
-    # print(problem.goal_test(arr3))
 
     # if any of your moves is illegal (e.g., moves the blank space out-of-bounds)
     # then the output is considered a failure
