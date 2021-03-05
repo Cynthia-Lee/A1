@@ -1,1 +1,1 @@
-R,D,R,U,L,D,D,U,R,R,D,U,D,D
+L,U,U,R,D,L,D,R

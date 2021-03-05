@@ -9,6 +9,9 @@ from Heuristics import Heuristics
 # Sources used:
 # Lecture slides
 # https://pages.mtu.edu/~nilufer/classes/cs5811/2012-fall/lecture-slides/cs5811-ch03-search-b-informed-v2.pdf
+# http://mas.cs.umass.edu/classes/cs683/lectures-2010/Lec5_Search4-F2010-4up.pdf
+# https://github.com/JaneHJY/8_puzzle
+# https://en.wikipedia.org/wiki/Admissible_heuristic
 # -------------------------------------------------------
 
 # takes in input file and returns a 2d array to represent the state
