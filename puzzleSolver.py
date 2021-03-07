@@ -4,13 +4,13 @@ from typing import Any
 import queue
 from TileProblem import TileProblem
 from Heuristics import Heuristics
+import datetime
 
 # -------------------------------------------------------
 # Sources used:
 # Lecture slides
 # https://pages.mtu.edu/~nilufer/classes/cs5811/2012-fall/lecture-slides/cs5811-ch03-search-b-informed-v2.pdf
 # http://mas.cs.umass.edu/classes/cs683/lectures-2010/Lec5_Search4-F2010-4up.pdf
-# https://github.com/JaneHJY/8_puzzle
 # https://en.wikipedia.org/wiki/Admissible_heuristic
 # -------------------------------------------------------
 
@@ -61,6 +61,7 @@ def reconstruct_path(node):
     while(ptr.parent!=None):
         solution.insert(0, ptr.action)
         ptr = ptr.parent
+    # print("Depth", len(solution))
     return solution
 
 def a_star(problem, h):
@@ -86,6 +87,7 @@ def a_star(problem, h):
         current = frontier.get().item
         # if goal-test(current) return success # goal test when node expands
         if problem.goal_test(current.state):
+            # print("Number of states explored:", len(explored)+1, "ANSWER:", reconstruct_path(current))
             return reconstruct_path(current) 
         # if current not in explored:
         if not current in explored:
@@ -106,7 +108,11 @@ def a_star(problem, h):
                     frontier.put(PrioritizedItem(new_node.f, new_node))
     return False
 
+counter = 1
+
 def recursive_best_first_search(problem, h):
+    global counter
+    counter = 1
     # solution, fvalue <- rbfs(problem, node(problem.initial), inf, h)
     start = Node(problem)
     start.h = h(start.state)
@@ -119,7 +125,7 @@ def rbfs(problem, node, f_limit, h):
     if (problem.goal_test(node.state)):
         return reconstruct_path(node)
     sucessors = []
-    for action in problem.state_actions(node.state): # neighbors/sucessors
+    for action in problem.state_actions(node.state, node.action): # neighbors/sucessors
         # add child_node(problem, node, action) into sucessors
         new = problem.change_state(node.state, action) # new problem
         child_node = Node(new, node, action) # neighbor
@@ -148,6 +154,8 @@ def rbfs(problem, node, f_limit, h):
             return (False, best.f)
         # alternative <- the second lowest f-value among successors
         # result, best.f <- RBFS(problem, best, min(f-limit,alternative))
+        global counter
+        counter += 1
         result = rbfs(problem, best, min(f_limit, alternative.f), h)
         best.f = result[1]
         # if result not = failure then return result
@@ -174,7 +182,8 @@ if __name__ == '__main__':
     heuristics = Heuristics()
     solution = []
 
-    print(problem.state)
+    # print(problem.state)
+    start = datetime.datetime.now()
     
     if (a == '1'):
         if (h == '1'):
@@ -188,7 +197,12 @@ if __name__ == '__main__':
             solution = recursive_best_first_search(problem, heuristics.hamming_distance)
     
     write_output(solution, output)
+
+    end = datetime.datetime.now()
+    # hour, minute, second
+    print((end - start) * 1000.0) 
     
+    '''
     # TESTS
     heuristics = Heuristics()
     problem1 = TileProblem(3, input_to_state(3, "puzzle1.txt"))
@@ -212,18 +226,19 @@ if __name__ == '__main__':
     print(a_star(problem5, heuristics.manhattan_distance))
     # RBFS with hamming
     print("RBFS with hamming")
-    print(recursive_best_first_search(problem1, heuristics.hamming_distance))
-    print(recursive_best_first_search(problem2, heuristics.hamming_distance))
-    print(recursive_best_first_search(problem3, heuristics.hamming_distance))
-    print(recursive_best_first_search(problem4, heuristics.hamming_distance))
-    print(recursive_best_first_search(problem5, heuristics.hamming_distance))
+    print(recursive_best_first_search(problem1, heuristics.hamming_distance), counter)
+    print(recursive_best_first_search(problem2, heuristics.hamming_distance), counter)    
+    print(recursive_best_first_search(problem3, heuristics.hamming_distance), counter) 
+    print(recursive_best_first_search(problem4, heuristics.hamming_distance), counter)
+    print(recursive_best_first_search(problem5, heuristics.hamming_distance), counter)
     # RBFS with manhattan
     print("RBFS with manhattan")
-    print(recursive_best_first_search(problem1, heuristics.manhattan_distance))
-    print(recursive_best_first_search(problem2, heuristics.manhattan_distance))
-    print(recursive_best_first_search(problem3, heuristics.manhattan_distance))
-    print(recursive_best_first_search(problem4, heuristics.manhattan_distance))
-    print(recursive_best_first_search(problem5, heuristics.manhattan_distance))
+    print(recursive_best_first_search(problem1, heuristics.manhattan_distance), counter)
+    print(recursive_best_first_search(problem2, heuristics.manhattan_distance), counter)
+    print(recursive_best_first_search(problem3, heuristics.manhattan_distance), counter)
+    print(recursive_best_first_search(problem4, heuristics.manhattan_distance), counter)
+    print(recursive_best_first_search(problem5, heuristics.manhattan_distance), counter)
+    '''
 
     # if any of your moves is illegal (e.g., moves the blank space out-of-bounds)
     # then the output is considered a failure

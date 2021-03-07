@@ -15,7 +15,7 @@ class TileProblem:
     # transition functions (used to change state)
 
     # returns legal actions for the state
-    def state_actions(self, state):
+    def state_actions(self, state, prev_action=None):
         state_actions = ['L', 'R', 'D', 'U']
         n = self.size
         row = 0
@@ -28,16 +28,16 @@ class TileProblem:
                 row +=1 
                 col = 0  
         # check left
-        if (col == 0):
+        if (prev_action == 'R' or col == 0):
             state_actions.remove('L')
         # check right
-        if (col == n-1):
+        if (prev_action == 'L' or col == n-1):
             state_actions.remove('R')
         # check down
-        if (row == n-1):
+        if (prev_action == 'U' or row == n-1):
             state_actions.remove('D')
         # check up
-        if (row == 0):
+        if (prev_action == 'D' or row == 0):
             state_actions.remove('U')
         return state_actions
 
